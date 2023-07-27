@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+// import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
-import { Repository } from 'typeorm';
+import { promises } from 'dns';
 
 @Injectable()
 export class UserService {
@@ -12,7 +14,17 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  // 함수 : 암호화 적용
+  async transformPassword(user: CreateUserDto): Promise<void> {
+    user.user_password = await bcrypt.hash(user.user_password, 10);
+    return Promise.resolve();
+  }
+
+  // 회원가입
+  async create(
+    createUserDto: CreateUserDto,
+  ): Promise<CreateUserDto | undefined> {
+    await this.transformPassword(createUserDto);
     return await this.userRepository.save(createUserDto);
   }
 
