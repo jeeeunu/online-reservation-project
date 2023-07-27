@@ -1,6 +1,6 @@
 import {
   Controller,
-  // Get,
+  Get,
   Post,
   Body,
   // Patch,
@@ -8,7 +8,8 @@ import {
   // Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UserCreateDto } from './dto/create-user.dto';
+import { SignInDto } from './dto/sign-in-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
@@ -17,8 +18,14 @@ export class UserController {
 
   // 회원가입
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  signUp(@Body() user: UserCreateDto) {
+    return this.userService.signUp(user);
+  }
+
+  // 로그인
+  @Post('/login')
+  async login(@Body() signInDto: SignInDto): Promise<any> {
+    return await this.userService.signIn(signInDto);
   }
 
   // @Get()

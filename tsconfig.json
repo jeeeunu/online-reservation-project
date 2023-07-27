@@ -16,6 +16,9 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    // 엄격한 유형 검사 옵션
+    "strict": true, // 모든 엄격한 유형 검사 옵션 활성화
+    "noImplicitAny": true // 명시적이지 않은 any 유형으로 표현식 및 선언 사용시 오류
   }
 }
