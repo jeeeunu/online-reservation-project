@@ -17,7 +17,9 @@ export class AuthService {
   ) {}
 
   // 로그인
-  async signIn(signInDto: SignInDto): Promise<string> {
+  async signIn(
+    signInDto: SignInDto,
+  ): Promise<{ message: string; access_token: string }> {
     const userFind: SignInDto = await this.userRepository.findOne({
       where: { user_email: signInDto.user_email },
     });
@@ -37,6 +39,9 @@ export class AuthService {
 
     const payload = { user_email: signInDto.user_email };
     const access_token = await this.jwtService.signAsync(payload); // expiresIn은 app.modules의 JwtModule 설정에 따라 자동으로 적용됨
-    return access_token;
+    return {
+      message: '로그인 완료, 토큰이 생성되었습니다.',
+      access_token,
+    };
   }
 }
