@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserCreateDto } from './dto/create-user.dto';
-import { SignInDto } from './dto/sign-in-user.dto';
+import { SignInDto } from '../auth/dto/sign-in-user.dto';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -23,7 +23,7 @@ export class UserService {
   }
 
   // 로그인
-  async signIn(signInDto: SignInDto): Promise<string | undefined> {
+  async signIn(signInDto: SignInDto): Promise<SignInDto | undefined> {
     const userFind: SignInDto = await this.userRepository.findOne({
       where: { user_email: signInDto.user_email },
     });
@@ -41,7 +41,7 @@ export class UserService {
       );
     }
 
-    return 'Login Success!';
+    return userFind;
   }
 
   // async findOne(id: number) {
