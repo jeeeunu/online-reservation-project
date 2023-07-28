@@ -9,12 +9,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { promises } from 'dns';
 
-export class UnauthorizedException extends HttpException {
-  constructor() {
-    super('Unauthorized', HttpStatus.UNAUTHORIZED);
-  }
-}
-
 @Injectable()
 export class UserService {
   constructor(
@@ -30,23 +24,24 @@ export class UserService {
 
   // 로그인
   async signIn(signInDto: SignInDto): Promise<string | undefined> {
-    try {
-      const userFind: SignInDto = await this.userRepository.findOne({
-        where: { user_email: signInDto.user_email },
-      });
+    const userFind: SignInDto = await this.userRepository.findOne({
+      where: { user_email: signInDto.user_email },
+    });
 
-      // 암호화된 비밀번호와 비교
-      const validatePassword: boolean = await bcrypt.compare(
-        signInDto.user_password,
-        userFind.user_password,
+    // 암호화된 비밀번호와 비교
+    const isPasswordMatching: boolean = await bcrypt.compare(
+      signInDto.user_password,
+      userFind.user_password,
+    );
+
+    if (!isPasswordMatching) {
+      throw new HttpException(
+        '비밀번호가 일치하지 않습니다.',
+        HttpStatus.FORBIDDEN,
       );
+    }
 
-      if (!validatePassword) {
-        throw new UnauthorizedException();
-      }
-
-      return 'Login Success!';
-    } catch {}
+    return 'Login Success!';
   }
 
   // async findOne(id: number) {
