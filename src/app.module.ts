@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ormConfig } from './orm.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { PerformanceModule } from './performance/performance.module';
 @Module({
   imports: [
     UserModule,
@@ -21,7 +22,6 @@ import { AuthModule } from './auth/auth.module';
       useFactory: async (configService: ConfigService) => ({
         global: true,
         secret: configService.get<string>('DB_JWT_SECRET_KEY'),
-        signOptions: { expiresIn: '60s' },
       }),
       inject: [ConfigService], // ConfigService 주입
     }),
@@ -29,6 +29,8 @@ import { AuthModule } from './auth/auth.module';
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
 
     AuthModule,
+
+    PerformanceModule,
   ],
 })
 export class AppModule {}

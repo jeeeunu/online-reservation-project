@@ -19,4 +19,7 @@ export class User {
 
   @Column()
   user_image: string;
+
+  @Column()
+  is_admin: boolean;
 }

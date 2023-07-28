@@ -1,16 +1,16 @@
+// user.controller.ts
 import {
   Controller,
   Get,
   Post,
   Body,
   // Patch,
-  // Param,
+  Param,
   // Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserCreateDto } from './dto/create-user.dto';
-import { SignInDto } from '../auth/dto/sign-in-user.dto';
-// import { UpdateUserDto } from './dto/update-user.dto';
+import { UserProfile } from './dto/user-profile.dto';
 
 @Controller('user')
 export class UserController {
@@ -22,9 +22,9 @@ export class UserController {
     return this.userService.signUp(user);
   }
 
-  // 로그인
-  @Post('/login')
-  async login(@Body() signInDto: SignInDto): Promise<any> {
-    return await this.userService.signIn(signInDto);
+  // 프로필 보기
+  @Get(':id')
+  getProfile(@Param('id') userId: number): Promise<UserProfile> {
+    return this.userService.getUserById(userId);
   }
 }

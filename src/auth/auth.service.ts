@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { SignInDto } from '../auth/dto/sign-in-user.dto';
+import { UserCreateDto } from '../user/dto/create-user.dto';
 import { User } from '../entities/user.entity';
 
 @Injectable()
@@ -16,11 +17,9 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  // 로그인
-  async signIn(
-    signInDto: SignInDto,
-  ): Promise<{ message: string; access_token: string }> {
-    const userFind: SignInDto = await this.userRepository.findOne({
+  // 로그인 (토큰 생성)
+  async signIn(signInDto: SignInDto): Promise<string> {
+    const userFind: UserCreateDto = await this.userRepository.findOne({
       where: { user_email: signInDto.user_email },
     });
 
@@ -37,11 +36,12 @@ export class AuthService {
       );
     }
 
-    const payload = { user_email: signInDto.user_email };
-    const access_token = await this.jwtService.signAsync(payload); // expiresIn은 app.modules의 JwtModule 설정에 따라 자동으로 적용됨
-    return {
-      message: '로그인 완료, 토큰이 생성되었습니다.',
-      access_token,
+    // JWT 토큰에 포함될 payload
+    const payload = {
+      user_email: signInDto.user_email,
+      isAdmin: userFind.is_admin,
     };
+    const access_token = await this.jwtService.signAsync(payload); // expiresIn은 auth.modules 설정에 따라 자동으로 적용됨
+    return access_token;
   }
 }
