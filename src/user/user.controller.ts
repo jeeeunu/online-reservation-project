@@ -8,6 +8,7 @@ import {
   Param,
   // Delete,
 } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserCreateDto } from './dto/create-user.dto';
 import { UserProfile } from './dto/user-profile.dto';
@@ -19,6 +20,12 @@ export class UserController {
   // 회원가입
   @Post()
   signUp(@Body() user: UserCreateDto) {
+    if (!user.user_email || !user.user_password || !user.user_password) {
+      throw new HttpException(
+        '필수 항목 데이터를 확인해주세요.',
+        HttpStatus.FORBIDDEN,
+      );
+    }
     return this.userService.signUp(user);
   }
 
