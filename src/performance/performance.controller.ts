@@ -1,5 +1,14 @@
 // performance.controller.ts
-import { Controller, Post, Body, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Request,
+  Param,
+  Query,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PerformanceService } from './performance.service';
 import { CreatePerformanceDto } from './dto/create-performance.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
@@ -9,7 +18,7 @@ import { CustomRequest } from '../interfaces/custom-request.interface';
 export class PerformanceController {
   constructor(private readonly performanceService: PerformanceService) {}
 
-  // 공연 등록
+  //-- 공연 등록 --//
   @Post()
   async createPerformance(
     @Body() perf: CreatePerformanceDto,
@@ -34,8 +43,6 @@ export class PerformanceController {
         !perf.perf_price ||
         !perf.perf_address ||
         !perf.perf_image ||
-        !perf.created_At ||
-        !perf.updated_At ||
         !perf.perf_date_time ||
         perf.perf_date_time.length === 0
       ) {
@@ -54,11 +61,42 @@ export class PerformanceController {
       }
 
       return this.performanceService.create(perf);
-    } catch {
-      throw new HttpException(
-        '필수 항목 데이터를 확인해주세요.',
-        HttpStatus.BAD_GATEWAY,
-      );
+    } catch (err) {
+      console.error(err);
+      throw new InternalServerErrorException('공연 등록에 실패했습니다');
+    }
+  }
+
+  //-- 공연 전체조회 --//
+  @Get()
+  async Performance() {
+    try {
+      return this.performanceService.getAll();
+    } catch (err) {
+      console.error(err);
+      throw new InternalServerErrorException('공연 검색에 실패했습니다');
+    }
+  }
+
+  //-- 공연 검색 --//
+  @Get('/search')
+  async PerformanceSearch(@Query('performanceName') performanceName: string) {
+    try {
+      return await this.performanceService.getSearchResult(performanceName);
+    } catch (err) {
+      console.error(err);
+      throw new InternalServerErrorException('공연 검색에 실패했습니다');
+    }
+  }
+
+  //-- 공연 상세보기 --//
+  @Get('/detail/:performanceId')
+  async getPerformanceDetail(@Param('performanceId') performanceId: number) {
+    try {
+      return await this.performanceService.getPerformanceDetail(performanceId);
+    } catch (err) {
+      console.log(err);
+      throw new Error('Failed to get performance detail.');
     }
   }
 }

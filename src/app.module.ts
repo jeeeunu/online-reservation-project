@@ -9,6 +9,7 @@ import { ormConfig } from './orm.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PerformanceModule } from './performance/performance.module';
+import { ReservationModule } from './reservation/reservation.module';
 @Module({
   imports: [
     UserModule,
@@ -31,6 +32,8 @@ import { PerformanceModule } from './performance/performance.module';
     AuthModule,
 
     PerformanceModule,
+
+    ReservationModule,
   ],
 })
 export class AppModule {}

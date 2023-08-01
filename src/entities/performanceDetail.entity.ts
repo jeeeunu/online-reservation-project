@@ -5,8 +5,10 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Performance } from './performance.entity';
+import { Seat } from './seat.entity';
 
 @Entity({ name: 'PerformanceDetail' })
 export class PerformanceDetail {
@@ -25,4 +27,7 @@ export class PerformanceDetail {
   @ManyToOne(() => Performance, (performance) => performance.details)
   @JoinColumn({ name: 'Perf_id' })
   performance: Performance;
+
+  @OneToMany(() => Seat, (seat) => seat.performanceDetail)
+  seats: Seat[];
 }

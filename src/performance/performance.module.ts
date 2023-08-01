@@ -6,9 +6,10 @@ import { PerformanceService } from './performance.service';
 import { Performance } from '../entities/performance.entity';
 import { PerformanceDetail } from '../entities/performanceDetail.entity';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
+import { Seat } from 'src/entities/seat.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Performance, PerformanceDetail])],
+  imports: [TypeOrmModule.forFeature([Performance, PerformanceDetail, Seat])],
   controllers: [PerformanceController],
   providers: [PerformanceService],
 })

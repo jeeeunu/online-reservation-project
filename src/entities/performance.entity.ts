@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { PerformanceDetail } from './performanceDetail.entity';
 
 @Entity({ name: 'Performance' })
@@ -24,10 +31,10 @@ export class Performance {
   @Column()
   perf_image: string;
 
-  @Column()
+  @CreateDateColumn()
   created_At: Date;
 
-  @Column()
+  @UpdateDateColumn()
   updated_At: Date;
 
   @OneToMany(() => PerformanceDetail, (detail) => detail.performance)
