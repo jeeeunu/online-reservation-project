@@ -7,6 +7,7 @@ import { Response } from 'express';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  //-- 로그인 --//
   @Post('/login')
   async login(
     @Body() signInDto: SignInDto,
