@@ -1,5 +1,5 @@
 // performance.service.ts
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Performance } from '../entities/performance.entity';
@@ -23,41 +23,48 @@ export class PerformanceService {
   async create(
     createdPerformance: CreatePerformanceDto,
   ): Promise<{ message: string; data: CreatePerformanceDto } | undefined> {
-    const { perf_date_time } = createdPerformance;
+    try {
+      const { perf_date_time } = createdPerformance;
 
-    // Performance 데이터 생성
-    const savedPerformance = await this.performanceRepository.save(
-      createdPerformance,
-    );
+      // Performance 데이터 생성
+      const savedPerformance = await this.performanceRepository.save(
+        createdPerformance,
+      );
 
-    const savedDetails = await Promise.all(
-      perf_date_time.map(async (dateTime) => {
-        const detail = new PerformanceDetail();
-        detail.Perf_id = savedPerformance.perf_id;
-        detail.date = dateTime.date;
-        detail.time = dateTime.time;
-        const savedDetail = await this.performanceDetailRepository.save(detail);
+      const savedDetails = await Promise.all(
+        perf_date_time.map(async (dateTime) => {
+          const detail = new PerformanceDetail();
+          detail.Perf_id = savedPerformance.perf_id;
+          detail.date = dateTime.date;
+          detail.time = dateTime.time;
+          const savedDetail = await this.performanceDetailRepository.save(
+            detail,
+          );
 
-        // seat_row로 Seat 데이터를 찾아 perfd_id를 저장
-        const seats = await this.seatRepository.find({
-          where: { seat_row: dateTime.seat_row },
-        });
-        await Promise.all(
-          seats.map(async (seat) => {
-            seat.Perfd_id = savedDetail.perfd_id; // 수정: savedDetail의 perfd_id 값을 사용
-            await this.seatRepository.save(seat);
-          }),
-        );
-        return savedDetail;
-      }),
-    );
+          // seat_row로 Seat 데이터를 찾아 perfd_id를 저장
+          const seats = await this.seatRepository.find({
+            where: { seat_row: dateTime.seat_row },
+          });
+          await Promise.all(
+            seats.map(async (seat) => {
+              seat.Perfd_id = savedDetail.perfd_id;
+              await this.seatRepository.save(seat);
+            }),
+          );
+          return savedDetail;
+        }),
+      );
 
-    savedPerformance.details = savedDetails;
-    delete savedPerformance['perf_date_time'];
-    return {
-      message: `공연 등록이 완료되었습니다.`,
-      data: savedPerformance,
-    };
+      savedPerformance.details = savedDetails;
+      delete savedPerformance['perf_date_time'];
+      return {
+        message: '공연 등록이 완료되었습니다.',
+        data: savedPerformance,
+      };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   //-- 공연 전체조회 --//
@@ -74,9 +81,9 @@ export class PerformanceService {
       });
 
       return result;
-    } catch (err) {
-      console.error(err);
-      throw new InternalServerErrorException('공연 조회에 실패했습니다');
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   }
 
@@ -90,38 +97,44 @@ export class PerformanceService {
       });
 
       return performances;
-    } catch (err) {
-      console.error(err);
-      throw new InternalServerErrorException('공연 검색에 실패했습니다');
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   }
 
   //-- 공연 상세보기 --//
   async getPerformanceDetail(performanceId: number) {
-    // 공연 ID로 Performance 정보 조회
-    const performance = await this.performanceRepository.findOne({
-      where: { perf_id: performanceId },
-      relations: ['details'],
-    });
-
-    if (!performance) {
-      throw new Error('Performance not found.');
-    }
-
-    // 관련된 PerformanceDetail 정보 조회
-    const performanceDetails = performance.details;
-
-    // PerformanceDetail 객체에 해당하는 seats 데이터를 넣는다.
-    for (const detail of performanceDetails) {
-      const seats = await this.seatRepository.find({
-        where: { Perfd_id: detail.Perf_id },
+    try {
+      // 공연 ID로 Performance 정보 조회
+      const performance = await this.performanceRepository.findOne({
+        where: { perf_id: performanceId },
+        relations: ['details'],
       });
-      detail.seats = seats;
-    }
 
-    return {
-      performance: performance,
-      performanceDetails: performanceDetails,
-    };
+      if (!performance) {
+        throw new HttpException(
+          '해당하는 공연이 없습니다.',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const performanceDetails = performance.details;
+
+      // PerformanceDetail 객체에 해당하는 seats 데이터 삽입
+      for (const detail of performanceDetails) {
+        const seats = await this.seatRepository.find({
+          where: { Perfd_id: detail.Perf_id },
+        });
+        detail.seats = seats;
+      }
+
+      return {
+        performance: performance,
+        performanceDetails: performanceDetails,
+      };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 }

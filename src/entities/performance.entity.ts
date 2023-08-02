@@ -1,3 +1,4 @@
+// performance.entity.ts
 import {
   Column,
   Entity,
@@ -5,13 +6,19 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { PerformanceDetail } from './performanceDetail.entity';
+import { User } from './user.entity';
 
 @Entity({ name: 'Performance' })
 export class Performance {
   @PrimaryGeneratedColumn()
   perf_id: number;
+
+  @Column()
+  User_id: number;
 
   @Column()
   perf_name: string;
@@ -31,12 +38,16 @@ export class Performance {
   @Column()
   perf_image: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamp' })
   created_At: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamp' })
   updated_At: Date;
 
   @OneToMany(() => PerformanceDetail, (detail) => detail.performance)
   details: PerformanceDetail[];
+
+  @ManyToOne(() => User, (user) => user.performance)
+  @JoinColumn({ name: 'User_id' })
+  user: User;
 }

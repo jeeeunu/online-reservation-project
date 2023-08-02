@@ -26,6 +26,7 @@ export class PerformanceController {
   ): Promise<{ message: string; data: CreatePerformanceDto }> {
     try {
       const userPayload = req.user;
+      perf.User_id = userPayload.user_id;
 
       // 검사 : 관리자 로그인
       if (!userPayload.isAdmin) {
@@ -70,33 +71,18 @@ export class PerformanceController {
   //-- 공연 전체조회 --//
   @Get()
   async Performance() {
-    try {
-      return this.performanceService.getAll();
-    } catch (err) {
-      console.error(err);
-      throw new InternalServerErrorException('공연 검색에 실패했습니다');
-    }
+    return this.performanceService.getAll();
   }
 
   //-- 공연 검색 --//
   @Get('/search')
   async PerformanceSearch(@Query('performanceName') performanceName: string) {
-    try {
-      return await this.performanceService.getSearchResult(performanceName);
-    } catch (err) {
-      console.error(err);
-      throw new InternalServerErrorException('공연 검색에 실패했습니다');
-    }
+    return await this.performanceService.getSearchResult(performanceName);
   }
 
   //-- 공연 상세보기 --//
   @Get('/detail/:performanceId')
   async getPerformanceDetail(@Param('performanceId') performanceId: number) {
-    try {
-      return await this.performanceService.getPerformanceDetail(performanceId);
-    } catch (err) {
-      console.log(err);
-      throw new Error('Failed to get performance detail.');
-    }
+    return await this.performanceService.getPerformanceDetail(performanceId);
   }
 }

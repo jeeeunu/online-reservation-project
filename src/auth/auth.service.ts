@@ -19,29 +19,35 @@ export class AuthService {
 
   // 로그인 (토큰 생성)
   async signIn(signInDto: SignInDto): Promise<string> {
-    const userFind: UserCreateDto = await this.userRepository.findOne({
-      where: { user_email: signInDto.user_email },
-    });
+    try {
+      const userFind: UserCreateDto = await this.userRepository.findOne({
+        where: { user_email: signInDto.user_email },
+      });
 
-    // 암호화된 비밀번호와 비교
-    const isPasswordMatching: boolean = await bcrypt.compare(
-      signInDto.user_password,
-      userFind.user_password,
-    );
-
-    if (!isPasswordMatching) {
-      throw new HttpException(
-        '비밀번호가 일치하지 않습니다.',
-        HttpStatus.FORBIDDEN,
+      // 암호화된 비밀번호와 비교
+      const isPasswordMatching: boolean = await bcrypt.compare(
+        signInDto.user_password,
+        userFind.user_password,
       );
-    }
 
-    // JWT 토큰에 포함될 payload
-    const payload = {
-      user_email: signInDto.user_email,
-      isAdmin: userFind.is_admin,
-    };
-    const access_token = await this.jwtService.signAsync(payload); // expiresIn은 auth.modules 설정에 따라 자동으로 적용됨
-    return access_token;
+      if (!isPasswordMatching) {
+        throw new HttpException(
+          '비밀번호가 일치하지 않습니다.',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      // JWT 토큰에 포함될 payload
+      const payload = {
+        user_email: signInDto.user_email,
+        isAdmin: userFind.is_admin,
+        user_id: userFind.user_id,
+      };
+      const access_token = await this.jwtService.signAsync(payload); // expiresIn은 auth.modules 설정에 따라 자동으로 적용됨
+      return access_token;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 }

@@ -1,6 +1,7 @@
 // create-performance.ts
 export class CreatePerformanceDto {
   perf_id: number;
+  User_id: number;
   perf_name: string;
   perf_description: string;
   perf_category: string;

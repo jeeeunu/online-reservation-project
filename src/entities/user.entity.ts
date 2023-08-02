@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Reservation } from './reservation.entity';
+import { Performance } from './performance.entity';
 
 @Entity({ name: 'User' })
 export class User {
@@ -20,6 +22,12 @@ export class User {
   @Column()
   user_image: string;
 
-  @Column()
+  @Column({ default: false })
   is_admin: boolean;
+
+  @OneToMany(() => Reservation, (reservation) => reservation.user)
+  reservations: Reservation[];
+
+  @OneToMany(() => Performance, (performance) => performance.user)
+  performance: Performance[];
 }
