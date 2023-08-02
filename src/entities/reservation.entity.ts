@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Performance } from './performance.entity';
 
 @Entity({ name: 'Reservation' })
 export class Reservation {
@@ -33,4 +34,8 @@ export class Reservation {
   @ManyToOne(() => User, (user) => user.reservations)
   @JoinColumn({ name: 'User_id' })
   user: User;
+
+  @ManyToOne(() => Performance, (performance) => performance.reservations)
+  @JoinColumn({ name: 'Perf_id' })
+  performance: Performance;
 }

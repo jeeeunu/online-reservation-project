@@ -16,6 +16,9 @@ export class ReservationModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
-      .forRoutes({ path: 'reservation/:Perf_id', method: RequestMethod.POST });
+      .forRoutes(
+        { path: 'reservation/:Perf_id', method: RequestMethod.POST },
+        { path: 'reservation', method: RequestMethod.GET },
+      );
   }
 }

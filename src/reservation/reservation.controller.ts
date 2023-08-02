@@ -1,5 +1,6 @@
 import {
   Controller,
+  Get,
   Post,
   Body,
   Param,
@@ -42,5 +43,14 @@ export class ReservationController {
     reservation.User_id = userPayload.user_id;
 
     return this.reservationService.create(reservation);
+  }
+
+  //-- 예매 현황 --//
+  @Get()
+  async getReservation(@Request() req: CustomRequest) {
+    const userPayload = req.user;
+    const user_id = userPayload.user_id;
+
+    return this.reservationService.getAll(user_id);
   }
 }

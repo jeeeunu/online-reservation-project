@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { PerformanceDetail } from './performanceDetail.entity';
 import { User } from './user.entity';
+import { Reservation } from './reservation.entity';
 
 @Entity({ name: 'Performance' })
 export class Performance {
@@ -50,4 +51,7 @@ export class Performance {
   @ManyToOne(() => User, (user) => user.performance)
   @JoinColumn({ name: 'User_id' })
   user: User;
+
+  @OneToMany(() => Reservation, (reservation) => reservation.performance)
+  reservations: Reservation[];
 }

@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, Any } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { Performance } from '../entities/performance.entity';
@@ -124,5 +124,17 @@ export class ReservationService {
     } finally {
       await queryRunner.release(); // 객체 해제 (메모리 반환)
     }
+  }
+
+  //-- 예매 현황 --//
+  async getAll(user_id: number) {
+    const reservationData = await this.reservationRepository.find({
+      where: { User_id: user_id },
+      relations: ['performance'],
+      select: {
+        performance: { perf_name: true, perf_price: true, perf_address: true },
+      },
+    });
+    return reservationData;
   }
 }
