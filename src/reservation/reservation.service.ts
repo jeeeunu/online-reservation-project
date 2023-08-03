@@ -48,7 +48,6 @@ export class ReservationService {
       }
 
       // 좌석
-      // seat_reservation 처리 추가
       const seat = await this.seatRepository.findOne({
         where: { seat_id: reservation.Seat_id },
       });
@@ -117,10 +116,10 @@ export class ReservationService {
         message: '공연 예매가 완료되었습니다',
         data: reservationInfo,
       };
-    } catch (err) {
+    } catch (error) {
       await queryRunner.rollbackTransaction();
-      console.error(err);
-      throw err;
+      console.error(error);
+      throw error;
     } finally {
       await queryRunner.release(); // 객체 해제 (메모리 반환)
     }

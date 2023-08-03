@@ -7,13 +7,11 @@ import {
   Request,
   Param,
   Query,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { PerformanceService } from './performance.service';
 import { CreatePerformanceDto } from './dto/create-performance.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { CustomRequest } from '../interfaces/custom-request.interface';
-
 @Controller('performance')
 export class PerformanceController {
   constructor(private readonly performanceService: PerformanceService) {}
@@ -64,7 +62,7 @@ export class PerformanceController {
       return this.performanceService.create(perf);
     } catch (err) {
       console.error(err);
-      throw new InternalServerErrorException('공연 등록에 실패했습니다');
+      throw err;
     }
   }
 

@@ -7,6 +7,7 @@ import { Seat } from '../entities/seat.entity';
 import { Like } from 'typeorm';
 import { PerformanceDetail } from '../entities/performanceDetail.entity';
 import { CreatePerformanceDto } from './dto/create-performance.dto';
+import { performance } from 'perf_hooks';
 
 @Injectable()
 export class PerformanceService {
@@ -92,7 +93,7 @@ export class PerformanceService {
     try {
       // 공연
       const performances = await this.performanceRepository.find({
-        where: { perf_name: Like(`%${performanceName}%`) }, // typeORM의 Likie => 부분일치 검색
+        where: { perf_name: Like(`%${performanceName}%`) }, // typeORM의 Like => 부분일치 검색
         relations: ['details'], // Performance 엔티티에 설정한 관계 이름
       });
 
@@ -106,10 +107,9 @@ export class PerformanceService {
   //-- 공연 상세보기 --//
   async getPerformanceDetail(performanceId: number) {
     try {
-      // 공연 ID로 Performance 정보 조회
       const performance = await this.performanceRepository.findOne({
         where: { perf_id: performanceId },
-        relations: ['details'],
+        relations: ['details', 'details.seats'],
       });
 
       if (!performance) {
@@ -118,20 +118,8 @@ export class PerformanceService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      const performanceDetails = performance.details;
 
-      // PerformanceDetail 객체에 해당하는 seats 데이터 삽입
-      for (const detail of performanceDetails) {
-        const seats = await this.seatRepository.find({
-          where: { Perfd_id: detail.Perf_id },
-        });
-        detail.seats = seats;
-      }
-
-      return {
-        performance: performance,
-        performanceDetails: performanceDetails,
-      };
+      return performance;
     } catch (error) {
       console.error(error);
       throw error;
