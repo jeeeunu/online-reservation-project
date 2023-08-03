@@ -7,7 +7,6 @@ import { Seat } from '../entities/seat.entity';
 import { Like } from 'typeorm';
 import { PerformanceDetail } from '../entities/performanceDetail.entity';
 import { CreatePerformanceDto } from './dto/create-performance.dto';
-import { performance } from 'perf_hooks';
 
 @Injectable()
 export class PerformanceService {

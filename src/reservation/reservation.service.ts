@@ -50,7 +50,9 @@ export class ReservationService {
       // 좌석
       const seat = await this.seatRepository.findOne({
         where: { seat_id: reservation.Seat_id },
+        lock: { mode: 'pessimistic_write' }, // 동시성 처리를 위해 이미 예매중인 seat에 접근하지 못하도록 설정
       });
+
       if (!seat) {
         throw new HttpException(
           '좌석 정보가 잘못되었습니다',
