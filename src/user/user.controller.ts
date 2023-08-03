@@ -10,14 +10,14 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserCreateDto } from './dto/create-user.dto';
-import { UserProfile } from './dto/user-profile.dto';
+import { UserProfile } from './interfaces/user-profile.interface';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   //-- 회원가입 --//
   @Post()
-  async signUp(@Body() user: UserCreateDto) {
+  async signUp(@Body() user: UserCreateDto): Promise<{ message: string }> {
     // 필수항목 검사
     if (!user.user_email || !user.user_password || !user.user_password) {
       throw new HttpException(

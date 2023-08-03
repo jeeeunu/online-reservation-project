@@ -11,19 +11,20 @@ erd: https://www.erdcloud.com/d/WGACsLzEWKF9eTqDB<br>
 ---
 
 ## REST API
-|Content|Method|path|
-|------|---|---|
-|회원가입|POST|'/user'|
-|로그인|POST|'/auth/login'|
-|프로필 보기|GET|'/user/:user_id'|
-|공연 등록|POST|'/performance'|
-|전체 공연 보기|GET|'/performance'|
-|공연 검색하기|GET|'/performance/search?performanceName='공연 이름''|
-|공연 상세보기|GET|'/performance/detail/:perf_id'|
-|공연 예매하기|POST|'/reservation/:perf_id'|
-|공연 예매현황|GET|'/reservation'|
 
+| Content        | Method | path                                              |
+| -------------- | ------ | ------------------------------------------------- |
+| 회원가입       | POST   | '/user'                                           |
+| 로그인         | POST   | '/auth/login'                                    |
+| 프로필 보기    | GET    | '/user/:user_id'                                  |
+| 공연 등록      | POST   | '/performance'                                    |
+| 전체 공연 보기 | GET    | '/performance'                                    |
+| 공연 검색하기  | GET    | '/performance/search?performanceName='공연 이름'' |
+| 공연 상세보기  | GET    | '/performance/detail/:perf_id'                    |
+| 공연 예매하기  | POST   | '/reservation/:perf_id'                           |
+| 공연 예매현황  | GET    | '/reservation'                                    |
 
+---
 
 ## 개발 기간
 

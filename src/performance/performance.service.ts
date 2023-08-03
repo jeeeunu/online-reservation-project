@@ -96,6 +96,13 @@ export class PerformanceService {
         relations: ['details'], // Performance 엔티티에 설정한 관계 이름
       });
 
+      if (performances.length === 0) {
+        throw new HttpException(
+          '해당하는 공연이 없습니다.',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
       return performances;
     } catch (error) {
       console.error(error);
