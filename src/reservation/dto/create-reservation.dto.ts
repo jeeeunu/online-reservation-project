@@ -1,4 +1,3 @@
-// create-reservation.ts
 export class CreateReservationDto {
   Perf_id: number;
   User_id: number;

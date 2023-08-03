@@ -3,10 +3,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Performance } from './performance.entity';
+import { PerformanceDetail } from './performanceDetail.entity';
 
 @Entity({ name: 'Reservation' })
 export class Reservation {
@@ -29,7 +31,7 @@ export class Reservation {
   price: number;
 
   @Column({ type: 'timestamp' })
-  created_At: Date;
+  created_At: string;
 
   @ManyToOne(() => User, (user) => user.reservations)
   @JoinColumn({ name: 'User_id' })
@@ -38,4 +40,8 @@ export class Reservation {
   @ManyToOne(() => Performance, (performance) => performance.reservations)
   @JoinColumn({ name: 'Perf_id' })
   performance: Performance;
+
+  @OneToOne(() => PerformanceDetail, (detail) => detail.reservation)
+  @JoinColumn({ name: 'Perfd_id' })
+  detail: PerformanceDetail;
 }

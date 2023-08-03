@@ -6,9 +6,11 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Performance } from './performance.entity';
 import { Seat } from './seat.entity';
+import { Reservation } from './reservation.entity';
 
 @Entity({ name: 'PerformanceDetail' })
 export class PerformanceDetail {
@@ -30,4 +32,7 @@ export class PerformanceDetail {
 
   @OneToMany(() => Seat, (seat) => seat.performanceDetail)
   seats: Seat[];
+
+  @OneToOne(() => Reservation, (reservation) => reservation.detail)
+  reservation: Reservation;
 }

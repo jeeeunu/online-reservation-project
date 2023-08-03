@@ -6,6 +6,7 @@ import { Performance } from '../entities/performance.entity';
 import { Reservation } from '../entities/reservation.entity';
 import { User } from '../entities/user.entity';
 import { Seat } from '../entities/seat.entity';
+import { reservationInterface } from './interfaces/reservation.interface';
 
 @Injectable()
 export class ReservationService {
@@ -29,7 +30,7 @@ export class ReservationService {
   //-- 공연 예매 --//
   async create(
     reservation: CreateReservationDto,
-  ): Promise<{ message: string; data: object }> {
+  ): Promise<{ message: string; data: reservationInterface }> {
     // 트랜잭션
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -48,7 +49,7 @@ export class ReservationService {
       }
 
       // 좌석
-      const seat = await this.seatRepository.findOne({
+      const seat = await queryRunner.manager.findOne(Seat, {
         where: { seat_id: reservation.Seat_id },
         lock: { mode: 'pessimistic_write' }, // 동시성 처리를 위해 이미 예매중인 seat에 접근하지 못하도록 설정
       });
@@ -102,42 +103,66 @@ export class ReservationService {
       // 데이터 반영
       await this.userRepository.save(userAdmin);
       await this.userRepository.save(user);
-      await this.seatRepository.save(seat);
-      await this.reservationRepository.save(reservation);
+      await queryRunner.manager.save(seat);
+      const reservatedData = await this.reservationRepository.save(reservation);
+      await queryRunner.commitTransaction();
 
-      // 반환할 예매 현황
-      const reservationInfo = await this.performanceRepository
-        .createQueryBuilder('performance') // 'performance'라는 별칭으로 Performance 엔티티를 기준으로 쿼리 작성
-        .leftJoinAndSelect('performance.details', 'details') // Performance과 details 엔티티를 LEFT JOIN하고, 'details'라는 별칭으로 사용
-        .where('details.Perfd_id = :perfd_id', {
-          perfd_id: reservation.Perfd_id,
-        }) // details의 Perfd_id가 지정한 값과 일치하는 조건을 추가
-        .getOne(); // 결과를 하나의 엔티티로 가져옴
+      const reservationInfo: reservationInterface =
+        await this.reservationRepository.findOne({
+          where: { res_id: reservatedData.res_id },
+          relations: ['performance', 'detail'],
+          select: {
+            res_id: true,
+            Seat_id: true,
+            price: true,
+            created_At: true,
+            performance: {
+              perf_id: true,
+              User_id: true,
+              perf_name: true,
+              perf_description: true,
+              perf_address: true,
+            },
+            detail: {
+              date: true,
+              time: true,
+            },
+          },
+        });
 
       return {
         message: '공연 예매가 완료되었습니다',
         data: reservationInfo,
       };
     } catch (error) {
-      await queryRunner.rollbackTransaction();
       console.error(error);
-      throw error;
-    } finally {
+      await queryRunner.rollbackTransaction();
       await queryRunner.release(); // 객체 해제 (메모리 반환)
+      throw error;
     }
   }
 
   //-- 예매 현황 --//
-  async getAll(user_id: number) {
+  async getAll(user_id: number): Promise<reservationInterface[]> {
     try {
       const reservationData = await this.reservationRepository.find({
         where: { User_id: user_id },
-        relations: ['performance'],
+        relations: ['performance', 'detail'],
         select: {
+          res_id: true,
+          Seat_id: true,
+          price: true,
+          created_At: true,
           performance: {
+            perf_id: true,
+            User_id: true,
             perf_name: true,
-            perf_price: true,
+            perf_description: true,
             perf_address: true,
+          },
+          detail: {
+            date: true,
+            time: true,
           },
         },
       });
