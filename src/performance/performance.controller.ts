@@ -7,11 +7,13 @@ import {
   Request,
   Param,
   Query,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
+import { CustomRequest } from '../interfaces/custom-request.interface';
 import { PerformanceService } from './performance.service';
 import { CreatePerformanceDto } from './dto/create-performance.dto';
-import { HttpException, HttpStatus } from '@nestjs/common';
-import { CustomRequest } from '../interfaces/custom-request.interface';
+import { performanceInterface } from './interfaces/performance.interface';
 @Controller('performance')
 export class PerformanceController {
   constructor(private readonly performanceService: PerformanceService) {}
@@ -21,7 +23,7 @@ export class PerformanceController {
   async createPerformance(
     @Body() perf: CreatePerformanceDto,
     @Request() req: CustomRequest,
-  ): Promise<{ message: string; data: CreatePerformanceDto }> {
+  ): Promise<{ message: string; data: performanceInterface }> {
     try {
       const userPayload = req.user;
       perf.User_id = userPayload.user_id;
@@ -68,19 +70,23 @@ export class PerformanceController {
 
   //-- 공연 전체조회 --//
   @Get()
-  async Performance() {
+  async Performance(): Promise<performanceInterface[]> {
     return this.performanceService.getAll();
   }
 
   //-- 공연 검색 --//
   @Get('/search')
-  async PerformanceSearch(@Query('performanceName') performanceName: string) {
+  async PerformanceSearch(
+    @Query('performanceName') performanceName: string,
+  ): Promise<performanceInterface[]> {
     return await this.performanceService.getSearchResult(performanceName);
   }
 
   //-- 공연 상세보기 --//
   @Get('/detail/:performanceId')
-  async getPerformanceDetail(@Param('performanceId') performanceId: number) {
+  async getPerformanceDetail(
+    @Param('performanceId') performanceId: number,
+  ): Promise<performanceInterface> {
     return await this.performanceService.getPerformanceDetail(performanceId);
   }
 }

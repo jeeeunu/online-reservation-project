@@ -1,12 +1,12 @@
 // performance.service.ts
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Performance } from '../entities/performance.entity';
 import { Seat } from '../entities/seat.entity';
-import { Like } from 'typeorm';
 import { PerformanceDetail } from '../entities/performanceDetail.entity';
 import { CreatePerformanceDto } from './dto/create-performance.dto';
+import { performanceInterface } from './interfaces/performance.interface';
 
 @Injectable()
 export class PerformanceService {
@@ -22,7 +22,7 @@ export class PerformanceService {
   //-- 공연 등록 --//
   async create(
     createdPerformance: CreatePerformanceDto,
-  ): Promise<{ message: string; data: CreatePerformanceDto } | undefined> {
+  ): Promise<{ message: string; data: performanceInterface } | undefined> {
     try {
       const { perf_date_time } = createdPerformance;
 
@@ -68,19 +68,24 @@ export class PerformanceService {
   }
 
   //-- 공연 전체조회 --//
-  async getAll() {
+  async getAll(): Promise<performanceInterface[]> {
     try {
-      const Performances = await this.performanceRepository.find();
-      const PerformancesDetails = await this.performanceDetailRepository.find();
-
-      const result = Performances.map((performance) => {
-        const perf_date_time = PerformancesDetails.filter(
-          (detail) => detail.Perf_id === performance.perf_id,
-        );
-        return { ...performance, perf_date_time };
+      const Performances = await this.performanceRepository.find({
+        relations: ['details'],
+        select: {
+          perf_id: true,
+          perf_name: true,
+          perf_description: true,
+          perf_category: true,
+          perf_price: true,
+          perf_address: true,
+          perf_image: true,
+          created_At: true,
+          updated_At: true,
+        },
       });
 
-      return result;
+      return Performances;
     } catch (error) {
       console.error(error);
       throw error;
@@ -88,12 +93,25 @@ export class PerformanceService {
   }
 
   //-- 공연 검색 --//
-  async getSearchResult(performanceName: string) {
+  async getSearchResult(
+    performanceName: string,
+  ): Promise<performanceInterface[]> {
     try {
       // 공연
       const performances = await this.performanceRepository.find({
         where: { perf_name: Like(`%${performanceName}%`) }, // typeORM의 Like => 부분일치 검색
         relations: ['details'], // Performance 엔티티에 설정한 관계 이름
+        select: {
+          perf_id: true,
+          perf_name: true,
+          perf_description: true,
+          perf_category: true,
+          perf_price: true,
+          perf_address: true,
+          perf_image: true,
+          created_At: true,
+          updated_At: true,
+        },
       });
 
       if (performances.length === 0) {
@@ -111,7 +129,9 @@ export class PerformanceService {
   }
 
   //-- 공연 상세보기 --//
-  async getPerformanceDetail(performanceId: number) {
+  async getPerformanceDetail(
+    performanceId: number,
+  ): Promise<performanceInterface> {
     try {
       const performance = await this.performanceRepository.findOne({
         where: { perf_id: performanceId },
