@@ -6,7 +6,6 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { SignInDto } from '../auth/dto/sign-in-user.dto';
-import { UserCreateDto } from '../user/dto/create-user.dto';
 import { User } from '../entities/user.entity';
 
 @Injectable()
@@ -20,7 +19,7 @@ export class AuthService {
   // 로그인 (토큰 생성)
   async signIn(signInDto: SignInDto): Promise<string> {
     try {
-      const userFind: UserCreateDto = await this.userRepository.findOne({
+      const userFind = await this.userRepository.findOne({
         where: { user_email: signInDto.user_email },
       });
 
@@ -43,6 +42,7 @@ export class AuthService {
         isAdmin: userFind.is_admin,
         user_id: userFind.user_id,
       };
+
       const access_token = await this.jwtService.signAsync(payload); // expiresIn은 auth.modules 설정에 따라 자동으로 적용됨
       return access_token;
     } catch (error) {

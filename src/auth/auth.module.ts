@@ -13,7 +13,7 @@ import { AuthController } from './auth.controller';
     JwtModule.register({
       global: true,
       secret: 'DB_JWT_SECRET_KEY',
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '120s' },
     }),
     TypeOrmModule.forFeature([User]),
   ],

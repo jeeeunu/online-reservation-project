@@ -15,6 +15,6 @@ export class AuthController {
   ): Promise<{ message: string; access_token: string }> {
     const access_token = await this.authService.signIn(signInDto);
     res.cookie('Authentication', access_token);
-    return { message: '로그인 성공, 토큰이 생성되었습니다', access_token };
+    return { message: '로그인 성공, 토큰이 생성/저장되었습니다', access_token };
   }
 }
