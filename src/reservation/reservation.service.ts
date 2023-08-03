@@ -74,7 +74,7 @@ export class ReservationService {
       if (!userAdmin) {
         throw new HttpException(
           '관리자 정보가 잘못되었습니다',
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.NOT_FOUND,
         );
       }
 
@@ -85,7 +85,7 @@ export class ReservationService {
       if (!user) {
         throw new HttpException(
           '유저 정보가 잘못되었습니다',
-          HttpStatus.BAD_REQUEST,
+          HttpStatus.NOT_FOUND,
         );
       }
       userAdmin.user_point += reservation.price;
@@ -129,13 +129,26 @@ export class ReservationService {
 
   //-- 예매 현황 --//
   async getAll(user_id: number) {
-    const reservationData = await this.reservationRepository.find({
-      where: { User_id: user_id },
-      relations: ['performance'],
-      select: {
-        performance: { perf_name: true, perf_price: true, perf_address: true },
-      },
-    });
-    return reservationData;
+    try {
+      const reservationData = await this.reservationRepository.find({
+        where: { User_id: user_id },
+        relations: ['performance'],
+        select: {
+          performance: {
+            perf_name: true,
+            perf_price: true,
+            perf_address: true,
+          },
+        },
+      });
+
+      if (reservationData.length === 0) {
+        throw new HttpException('예매 내역이 없습니다.', HttpStatus.NOT_FOUND);
+      }
+      return reservationData;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 }
