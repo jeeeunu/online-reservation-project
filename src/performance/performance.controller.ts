@@ -26,16 +26,16 @@ export class PerformanceController {
   ): Promise<{ message: string; data: performanceInterface }> {
     try {
       const userPayload = req.user;
-      perf.User_id = userPayload.user_id;
 
       // 검사 : 관리자 로그인
-      if (!userPayload.isAdmin) {
+      if (!req.user || !userPayload.isAdmin) {
         throw new HttpException(
-          '공연 관리자로 로그인해주세요',
+          '공연 관리자로 로그인 후 진행해주세요',
           HttpStatus.FORBIDDEN,
         );
       }
 
+      perf.User_id = userPayload.user_id;
       // 검사 : 필수 항목 입력 여부
       if (
         !perf.perf_name ||

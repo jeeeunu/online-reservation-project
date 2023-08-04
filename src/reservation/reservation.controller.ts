@@ -26,6 +26,10 @@ export class ReservationController {
   ): Promise<{ message: string; data: reservationInterface }> {
     const userPayload = req.user;
 
+    if (!req.user) {
+      throw new HttpException('로그인 후 진행해주세요.', HttpStatus.FORBIDDEN);
+    }
+
     if (!reservation.Seat_id || !reservation.price || !reservation.Perfd_id) {
       throw new HttpException(
         '필수 항목 데이터를 확인해주세요.',

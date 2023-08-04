@@ -29,6 +29,7 @@ export class AuthMiddleware implements NestMiddleware {
           );
         }
         console.error(err);
+        throw err;
       }
     }
 
