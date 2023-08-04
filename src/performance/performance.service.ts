@@ -31,29 +31,26 @@ export class PerformanceService {
         createdPerformance,
       );
 
-      const savedDetails = await Promise.all(
-        perf_date_time.map(async (dateTime) => {
-          const detail = new PerformanceDetail();
-          detail.Perf_id = savedPerformance.perf_id;
-          detail.date = dateTime.date;
-          detail.time = dateTime.time;
-          const savedDetail = await this.performanceDetailRepository.save(
-            detail,
-          );
+      const savedDetails = [];
 
-          // seat_row로 Seat 데이터를 찾아 perfd_id를 저장
-          const seats = await this.seatRepository.find({
-            where: { seat_row: dateTime.seat_row },
-          });
-          await Promise.all(
-            seats.map(async (seat) => {
-              seat.Perfd_id = savedDetail.perfd_id;
-              await this.seatRepository.save(seat);
-            }),
-          );
-          return savedDetail;
-        }),
-      );
+      for (const dateTime of perf_date_time) {
+        const detail = new PerformanceDetail();
+        detail.Perf_id = savedPerformance.perf_id;
+        detail.date = dateTime.date;
+        detail.time = dateTime.time;
+        const savedDetail = await this.performanceDetailRepository.save(detail);
+
+        const seats = await this.seatRepository.find({
+          where: { seat_row: dateTime.seat_row },
+        });
+
+        for await (const seat of seats) {
+          seat.Perfd_id = savedDetail.perfd_id;
+          await this.seatRepository.save(seat);
+        }
+
+        savedDetails.push(savedDetail);
+      }
 
       savedPerformance.details = savedDetails;
       delete savedPerformance['perf_date_time'];
