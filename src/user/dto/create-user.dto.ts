@@ -1,7 +1,18 @@
+import { IsString, IsOptional } from 'class-validator';
 export class UserCreateDto {
-  user_email: string;
+  @IsString()
+  readonly user_email: string;
+
+  @IsString()
   user_password: string;
-  user_name: string;
-  user_image?: string;
-  is_admin?: boolean;
+
+  @IsString()
+  readonly user_name: string;
+
+  @IsString()
+  @IsOptional()
+  readonly user_image?: string;
+
+  @IsString()
+  readonly is_admin: boolean;
 }
