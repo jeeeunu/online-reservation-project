@@ -55,5 +55,6 @@ erd: https://www.erdcloud.com/d/WGACsLzEWKF9eTqDB<br>
 
 ### 온라인 예매
 
--좌석 지정 후 온라인 예매<br> -좌석 중복예매 방지 위해 Seat 테이블에 seat_reservaion 컬럼 추가해 예매 등록여부 확인 후 진행하도록 함.<br>  
--예매 트랜잭션 실행시에 Seat 데이터에 lock 을 걸어 둘 이상의 유저가 예매를 진행 할 수 없도록 함
+-좌석 지정 후 온라인 예매<br>
+-좌석 중복예매 방지 위해 Seat 테이블에 seat_reservaion 컬럼 추가해 예매 등록여부 확인 후 진행하도록 함<br>
+-예매 트랜잭션 실행시에 Seat 데이터에 lock 을 걸어 둘 이상의 유저가 예매를 진행 할 수 없도록 함<br>
