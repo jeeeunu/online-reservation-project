@@ -19,8 +19,10 @@ export class AuthMiddleware implements NestMiddleware {
     if (authToken) {
       try {
         const payload = this.jwtService.verify(authToken);
-        // console.log(payload);
-        req.user = payload;
+        req.user = {
+          isAdmin: payload.isAdmin,
+          req_user_id: payload.req_user_id,
+        };
       } catch (err: any) {
         if (err.name === 'TokenExpiredError') {
           throw new HttpException(

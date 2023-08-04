@@ -18,12 +18,6 @@ class PerformanceDateTime {
 }
 
 export class CreatePerformanceDto {
-  @IsNumber()
-  perf_id: number;
-
-  @IsNumber()
-  User_id: number;
-
   @IsString()
   perf_name: string;
 

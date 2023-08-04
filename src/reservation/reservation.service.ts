@@ -1,5 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { Repository, DataSource, Any } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { Performance } from '../entities/performance.entity';
@@ -29,6 +29,7 @@ export class ReservationService {
 
   //-- 공연 예매 --//
   async create(
+    parsedPerfId: number,
     reservation: CreateReservationDto,
   ): Promise<{ message: string; data: reservationInterface }> {
     // 트랜잭션
@@ -38,9 +39,10 @@ export class ReservationService {
     try {
       // 공연
       const performance = await this.performanceRepository.findOne({
-        where: { perf_id: reservation.Perf_id },
+        where: { perf_id: parsedPerfId },
         relations: ['user'],
       });
+
       if (!performance) {
         throw new HttpException(
           '해당하는 공연이 없습니다.',
@@ -104,7 +106,10 @@ export class ReservationService {
       await this.userRepository.save(userAdmin);
       await this.userRepository.save(user);
       await queryRunner.manager.save(seat);
-      const reservatedData = await this.reservationRepository.save(reservation);
+      const reservatedData = await this.reservationRepository.save({
+        ...reservation,
+        Perf_id: parsedPerfId,
+      });
       await queryRunner.commitTransaction();
 
       const reservationInfo: reservationInterface =

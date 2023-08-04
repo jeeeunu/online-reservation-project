@@ -35,7 +35,6 @@ export class PerformanceController {
         );
       }
 
-      perf.User_id = userPayload.user_id;
       // 검사 : 필수 항목 입력 여부
       if (
         !perf.perf_name ||
@@ -60,8 +59,7 @@ export class PerformanceController {
           HttpStatus.BAD_REQUEST,
         );
       }
-
-      return this.performanceService.create(perf);
+      return this.performanceService.create(userPayload, perf);
     } catch (err) {
       console.error(err);
       throw err;

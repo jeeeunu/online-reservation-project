@@ -21,15 +21,17 @@ export class PerformanceService {
 
   //-- 공연 등록 --//
   async create(
+    userPayload: { isAdmin: boolean; req_user_id: number },
     createdPerformance: CreatePerformanceDto,
   ): Promise<{ message: string; data: performanceInterface } | undefined> {
     try {
+      console.log(userPayload);
       const { perf_date_time } = createdPerformance;
-
       // Performance 데이터 생성
-      const savedPerformance = await this.performanceRepository.save(
-        createdPerformance,
-      );
+      const savedPerformance = await this.performanceRepository.save({
+        ...createdPerformance,
+        User_id: userPayload.req_user_id,
+      });
 
       const savedDetails = [];
 

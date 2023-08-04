@@ -37,17 +37,17 @@ export class ReservationController {
       );
     }
 
-    if (!userPayload.user_id) {
+    if (!userPayload.req_user_id) {
       throw new HttpException(
         '유저 정보가 확인되지 않습니다.',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    reservation.Perf_id = parseInt(Perf_id, 10);
-    reservation.User_id = userPayload.user_id;
+    const parsedPerfId = parseInt(Perf_id, 10);
+    reservation.User_id = userPayload.req_user_id;
 
-    return this.reservationService.create(reservation);
+    return this.reservationService.create(parsedPerfId, reservation);
   }
 
   //-- 예매 현황 --//
@@ -56,7 +56,7 @@ export class ReservationController {
     @Request() req: CustomRequest,
   ): Promise<reservationInterface[]> {
     const userPayload = req.user;
-    const user_id = userPayload.user_id;
+    const user_id = userPayload.req_user_id;
 
     return this.reservationService.getAll(user_id);
   }
