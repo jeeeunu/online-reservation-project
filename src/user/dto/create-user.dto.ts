@@ -1,4 +1,4 @@
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsBoolean } from 'class-validator';
 export class UserCreateDto {
   @IsString()
   readonly user_email: string;
@@ -13,6 +13,7 @@ export class UserCreateDto {
   @IsOptional()
   readonly user_image?: string;
 
-  @IsString()
+  @IsBoolean()
+  @IsOptional()
   readonly is_admin: boolean;
 }
