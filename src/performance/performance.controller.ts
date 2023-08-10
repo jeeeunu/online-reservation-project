@@ -29,10 +29,7 @@ export class PerformanceController {
 
       // 검사 : 관리자 로그인
       if (!req.user || !userPayload.isAdmin) {
-        throw new HttpException(
-          '공연 관리자로 로그인 후 진행해주세요',
-          HttpStatus.FORBIDDEN,
-        );
+        throw new HttpException('공연 관리자로 로그인 후 진행해주세요', HttpStatus.FORBIDDEN);
       }
 
       // 검사 : 필수 항목 입력 여부
@@ -46,10 +43,7 @@ export class PerformanceController {
         !perf.perf_date_time ||
         perf.perf_date_time.length === 0
       ) {
-        throw new HttpException(
-          '필수 항목 데이터를 확인해주세요.',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException('필수 항목 데이터를 확인해주세요.', HttpStatus.BAD_REQUEST);
       }
 
       // 검사 : 공연 50,000p 초과 여부
